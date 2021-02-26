@@ -1,10 +1,10 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
-// import { useMutation, gql } from "@apollo/client";
-// import { useRouter } from "next/router";
-// import Link from "next/link";
-// import { Image } from "cloudinary-react";
-// import { SearchBox } from "./searchBox";
+import { useMutation, gql } from "@apollo/client";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { Image } from "cloudinary-react";
+import { SearchBox } from "./searchBox";
 // import {
 //   CreateHouseMutation,
 //   CreateHouseMutationVariables,
@@ -56,7 +56,14 @@ export default function HouseForm({}: IProps) {
         <label htmlFor="search" className="block">
           Search for your address
         </label>
-        {/* SEARCH FIELD */}
+        <SearchBox
+          onSelectAddress={(address, latitude, longitude) => {
+            setValue("address", address);
+            setValue("latitude", latitude);
+            setValue("longitude", longitude);
+          }}
+          defaultValue=""
+        />
         {errors.address && <p>{errors.address.message}</p>}
       </div>
     </form>
