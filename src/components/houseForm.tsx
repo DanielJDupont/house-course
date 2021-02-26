@@ -31,6 +31,8 @@ export default function HouseForm({}: IProps) {
     IFormData
   >({ defaultValues: {} });
 
+  const address = watch("address");
+
   useEffect(() => {
     register({ name: "address" }, { required: "Please enter your address" });
     register({ name: "latitude" }, { required: true, min: -90, max: 90 });
@@ -65,6 +67,8 @@ export default function HouseForm({}: IProps) {
           defaultValue=""
         />
         {errors.address && <p>{errors.address.message}</p>}
+        {/* Display the selected address */}
+        <h2>{address}</h2>
       </div>
     </form>
   );

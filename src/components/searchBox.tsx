@@ -69,9 +69,15 @@ const ReadySearchBox = ({ onSelectAddress, defaultValue }: ISearchBoxProps) => {
     // You have already selected a suggestion, no reason to keep showing them.
     clearSuggestions();
 
+    // Try an API request using the google functions.
     try {
+      // Call the API to get a list of data about the address.
       const results = await getGeocode({ address });
+
+      // Using the first item in the list, we can do another API call to get the latitude and longitude of the address.
       const { lat, lng } = await getLatLng(results[0]);
+
+      // Now update our parent component with the address, lat, lng.
       onSelectAddress(address, lat, lng);
     } catch (error) {
       console.error("😱 Error: ", error);
