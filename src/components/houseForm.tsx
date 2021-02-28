@@ -27,6 +27,8 @@ interface IProps {}
 
 export default function HouseForm({}: IProps) {
   const [submitting, setSubmitting] = useState(false);
+  // We want some preview image state.
+  const [previewImage, setPreviewImage] = useState<string>();
   const { register, handleSubmit, setValue, errors, watch } = useForm<
     IFormData
   >({ defaultValues: {} });
@@ -47,8 +49,9 @@ export default function HouseForm({}: IProps) {
   };
 
   // onSubmit means it is successful, you cna use an onError for the second argument of handleSubmit to manage an error.
-
-  const handleCreate = async (data: IFormData) => {};
+  const handleCreate = async (data: IFormData) => {
+    console.log({ data });
+  };
 
   return (
     // We need to pass in a function into handleSubmit so handleSubmit actually knows what to even do with the form it is given with the onClick.
@@ -66,10 +69,97 @@ export default function HouseForm({}: IProps) {
           }}
           defaultValue=""
         />
-        {errors.address && <p>{errors.address.message}</p>}
-        {/* Display the selected address */}
-        <h2>{address}</h2>
+        {errors.address && (
+          <p style={{ color: "#ff6060" }}>{errors.address.message}</p>
+        )}
       </div>
+
+      {address && (
+        <>
+          <div className="mt-4">
+            <label
+              htmlFor="image"
+              className="p-4 border-dashed border-4 border-gray-600 block cursor-pointer"
+            >
+              Click to add image (16:9)
+            </label>
+            {/* The input functionality here is sort of added behind the scenes, label allows interactivity to it as well, just hide what input renders. */}
+            <input
+              id="image"
+              name="image"
+              type="file"
+              accept="images/*"
+              style={{ display: "none" }}
+              ref={register({
+                validate: (fileList: FileList) => {
+                  if (fileList.length === 1) return true;
+                  return "Please upload one file";
+                },
+              })}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                // Use optional chaining to stop failure if one of the objects or fields here is null.
+                // Note that optional chaining messes badly with the syntax of lists in javascript, you need to use a dot and square brackets to access elements now.
+                if (event?.target?.files?.[0]) {
+                  const file = event.target.files[0];
+                  const reader = new FileReader();
+                  // Takes in a blob type.
+                  reader.readAsDataURL(file);
+                  reader.onloadend = () => {
+                    setPreviewImage(reader.result as string);
+                  };
+                }
+              }}
+            />
+
+            {previewImage && (
+              <img
+                src={previewImage}
+                className="mt-4 object-cover"
+                // a dynamic 9 by 16 aspect ratio styled
+                style={{ width: "576px", height: `${(9 / 16) * 576}px` }}
+              />
+            )}
+          </div>
+          {errors.image && (
+            <p style={{ color: "#ff6060" }}>{errors.image.message}</p>
+          )}
+          <div className="mt-4">
+            <label htmlFor="bedrooms" className="block">
+              Beds
+            </label>
+            <input
+              id="bedrooms"
+              name="bedrooms"
+              type="number"
+              className="p-2"
+              ref={register({
+                required: "Please enter the number of bedrooms",
+                max: { value: 10, message: "Wooah, too big of a house!" },
+                min: { value: 1, message: "Must have at least 1 bedroom!" },
+              })}
+            />
+            {/* This works because of our dependence on refs. */}
+            {errors.bedrooms && (
+              <p style={{ color: "#ff6060" }}>{errors.bedrooms.message}</p>
+            )}
+          </div>
+
+          <div className="mt-4">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 font-bold py-2 px-4 rounded"
+              style={{ marginRight: "20px" }}
+              type="submit"
+              disabled={submitting}
+            >
+              Save
+            </button>
+            {/* Sends us back to the homepage. */}
+            <Link href="/">
+              <a>Cancel</a>
+            </Link>
+          </div>
+        </>
+      )}
     </form>
   );
 }
