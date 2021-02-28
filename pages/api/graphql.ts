@@ -44,6 +44,11 @@ There are two key things we must export from our file.
 We must export our handler, so our API can recieve and process requests.
 We also need to export an additional config in additional to handler, or a configuration to our handler.
 Not sure where config is used, i think handler is automatically used, both may be automatically used.
+Note that you must go to the /api/graphql endpoint to update the graphql schema file: schema.gql to the latest version.
+This is important because we are doing typescript code generation based upon the contents of the schema.gql file.
+
+Note that it is going to be common that schema.gql is not up to date due to failing to visit the /api/graphql endpoint after
+adding in new or changing the graphql resolvers.
 */
 
 export default handler;
