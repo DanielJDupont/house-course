@@ -9,3 +9,34 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+// Here we are going to declare a table.
+model House {
+  // Starts at 1 and counts upwards.
+  id        Int      @id @default(autoincrement())
+  userId    String   @map(name: "user_id")
+  image     String
+  latitude  Float
+  longitude Float
+  address   String
+  bedrooms  Int
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @map(name: "updated_at")
+
+  // Index on a foreign key.
+  // The whole table is mapped as House.
+  @@index([userId], name: "houses.userId")
+  @@map(name: "houses")
+}
+
+// Note how we created a migration with yarn db:migrate:new, but we never executed the migration.
+// Note that migrations are all about moving the database from one state to another.
+// So migrations all have a diff associated with them because they are state transitions.
+// Once you are happy with the details of your migration,
+// Note that your migration has a gaurenteed unique date id, followed by the name of the migration you gave it, separated by dashses.
+// You have to now call yarn db:migrate:up to send up your changes.
+// This will actually execute the migration.
+// We have to make sure that we generate a prima client.
+// yarn db:generate, it makes a local node module you import from, but this node module has all of the types of your database in it
+// yarn db:generate creates all of your types.
+// It is a primsa client node module or npm-like package, that is specific only to your database.
