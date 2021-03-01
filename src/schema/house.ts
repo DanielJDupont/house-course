@@ -66,12 +66,15 @@ class House {
 
   @Field((_type) => String)
   image!: string;
+
+  @Field((_type) => String)
   publicId(): string {
     const parts = this.image.split("/");
     return parts[parts.length - 1];
   }
   // image!: string;
 
+  // The front end cloudinary api wants the public id to display the image, we have no other use of it.
   @Field((_type) => Int)
   bedrooms!: number;
 }
@@ -79,6 +82,12 @@ class House {
 // Make the mutation that will live inside of this resolver.
 @Resolver()
 export class HouseResolver {
+  // Anyone can load a house, do not need the authorized context.
+  @Query((_returns) => House, { nullable: true })
+  async house(@Arg("id") id: string, @Ctx() ctx: Context) {
+    return ctx.prisma.house.findOne({ where: { id: parseInt(id) } });
+  }
+
   @Authorized()
   @Mutation((_returns) => House, { nullable: true })
   // Note that this will access the database so it needs to be asynchronous.

@@ -15,6 +15,7 @@ type House {
   image: String!
   latitude: Float!
   longitude: Float!
+  publicId: String!
   userId: String!
 }
 
@@ -37,4 +38,5 @@ type Mutation {
 
 type Query {
   hello: String!
+  house(id: String!): House
 }
