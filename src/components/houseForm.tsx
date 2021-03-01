@@ -1,15 +1,15 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, gql } from "@apollo/client";
-// import { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import Link from "next/link";
-// import { Image } from "cloudinary-react";
+import { Image } from "cloudinary-react";
 
 import { SearchBox } from "./searchBox";
-// import {
-//   CreateHouseMutation,
-//   CreateHouseMutationVariables,
-// } from "src/generated/CreateHouseMutation";
+import {
+  CreateHouseMutation,
+  CreateHouseMutationVariables,
+} from "src/generated/CreateHouseMutation";
 // import {
 //   UpdateHouseMutation,
 //   UpdateHouseMutationVariables,
@@ -34,6 +34,14 @@ const SIGNATURE_MUTATION = gql`
     createImageSignature {
       signature
       timestamp
+    }
+  }
+`;
+
+const CREATE_HOUSE_MUTATION = gql`
+  mutation CreateHouseMutation($input: HouseInput!) {
+    createHouse(input: $input) {
+      id
     }
   }
 `;
@@ -87,6 +95,7 @@ interface IFormData {
 interface IProps {}
 
 export default function HouseForm({}: IProps) {
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   // We want some preview image state.
   const [previewImage, setPreviewImage] = useState<string>();
@@ -103,6 +112,11 @@ export default function HouseForm({}: IProps) {
   const [createSignature] = useMutation<CreateSignatureMutation>(
     SIGNATURE_MUTATION
   );
+
+  const [createHouse] = useMutation<
+    CreateHouseMutation,
+    CreateHouseMutationVariables
+  >(CREATE_HOUSE_MUTATION);
 
   useEffect(() => {
     register({ name: "address" }, { required: "Please enter your address" });
@@ -132,6 +146,27 @@ export default function HouseForm({}: IProps) {
       // To view the data to make a type for it.
       // console.log(imageData);
       // imageData.secure_url
+      const { data: houseData } = await createHouse({
+        variables: {
+          input: {
+            address: data.address,
+            image: imageData.secure_url,
+            coordinates: {
+              longitude: data.longitude,
+              latitude: data.latitude,
+            },
+            // Convert the string to an int, don't needto specify the radix of 10, so don't do it.
+            bedrooms: parseInt(data.bedrooms),
+          },
+        },
+      });
+
+      if (houseData?.createHouse) {
+        router.push(`/houses/${houseData.createHouse.id}`);
+      } else {
+        // We should have validated the form and also ensured that the user is logged in.
+        // can be an alert here of a failure, but a failure here is due to the programer, not due to the user.
+      }
     }
   };
 
@@ -265,4 +300,11 @@ You can use the field keys to name each callback function meaningfully, whereas 
 
 valueAsDate, text input only, returns a Date string.
 setValueAs, return input value by running through the function.
+
+I feel that merit being rewarded is a myth in our society. But all we can do is all we can do.
+Work on the correct things as hard as possible.
+
+No one wants to reveal their calendar, have a calendar you can be proud of at the end of each day, that is critical.
+
+Overcome the weakness of emotion with the power of logic, overcome the weakness of logic with the power of emotion.
 */
