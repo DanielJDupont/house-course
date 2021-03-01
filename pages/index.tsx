@@ -8,15 +8,15 @@ import Map from "src/components/map";
 // import { useLocalState } from "src/utils/useLocalState";
 // import { HousesQuery, HousesQueryVariables } from "src/generated/HousesQuery";
 
-const HELLO_QUERY = gql`
-  query HelloQuery {
-    hello
-  }
-`;
+// const HELLO_QUERY = gql`
+//   query HelloQuery {
+//     hello
+//   }
+// `;
 
 const Home = () => {
   // A very simple query, we are not passing in our own parameters into it.
-  const { data, loading } = useQuery(HELLO_QUERY);
+  // const { data, loading } = useQuery(HELLO_QUERY);
 
   return (
     <Layout
@@ -27,7 +27,7 @@ const Home = () => {
             style={{ maxHeight: "calc(100vh - 64px)", overflowX: "scroll" }}
           >
             HouseList
-            <pre>{JSON.stringify(data, null, 2)}</pre>
+            {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
           </div>
           <div className="w-1/2">
             <Map />
