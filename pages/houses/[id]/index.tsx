@@ -28,6 +28,7 @@ export default function ShowHouse() {
     query: { id },
   } = useRouter();
 
+  // Next.js generates this page statically, upon the first visit, the router will not be initialized, upon the re-render it will then show the id.
   if (!id) return null;
 
   // We know for sure id will just be one string, not an array.
@@ -78,3 +79,4 @@ const HouseData = ({ id }: { id: string }) => {
 };
 
 // Note that id is created dynamically.
+// Note that id is a dynamic placeholder.

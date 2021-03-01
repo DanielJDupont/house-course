@@ -80,10 +80,16 @@ class House {
 }
 
 // Make the mutation that will live inside of this resolver.
+// Note that Resolver has a Query and a Mutation here.
+// Note that we name our query and mutation under @Query and @Mutation decorators.
+// Note the broken looking syntax, just write the name of the query or mutation followed by parenthesis then a curly bracket body.
+// Note that we write async before our query and mutation names because we often want to access the database, which is an asynchronous operation
+// which takes a relatively large amount of time, miliseconds or maybe even seconds, compared to microseconds.
 @Resolver()
 export class HouseResolver {
   // Anyone can load a house, do not need the authorized context.
   @Query((_returns) => House, { nullable: true })
+  // Simply calling this query "house"
   async house(@Arg("id") id: string, @Ctx() ctx: Context) {
     return ctx.prisma.house.findOne({ where: { id: parseInt(id) } });
   }
@@ -91,6 +97,7 @@ export class HouseResolver {
   @Authorized()
   @Mutation((_returns) => House, { nullable: true })
   // Note that this will access the database so it needs to be asynchronous.
+  // Simply calling this mutation "createHouse"
   async createHouse(
     // type-graphql
     // Decorate, variable name, Typescript.
