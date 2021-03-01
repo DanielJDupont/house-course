@@ -12,6 +12,8 @@ Rather than what we have in REST, where we code many endpoints with each endpoin
 GraphQL sort of takes the idea of GET, POST, UPDATE for 1 REST endpoint and expands upon it massively so we only need 1 REST endpoint with as many resolvers as we like.
 Can set tracing on as well.
 Our graphql server is apollo server, well, apollo server micro.
+
+Okay so now we are going to create a mutation to send the house to the database.
 */
 
 const server = new ApolloServer({
