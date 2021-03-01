@@ -63,10 +63,10 @@ const HouseData = ({ id }: { id: string }) => {
               dpr="auto"
               quality="auto"
               width={900}
-              // // Maintain an aspect ratio of 9 by 16.
+              // Maintain an aspect ratio of 9 by 16.
               height={Math.floor((9 / 16) * 900)}
               crop="fill"
-              // // When cropped, it will try to focus on what part of the image is the most interesting.
+              // When cropped, it will try to focus on what part of the image is the most interesting.
               gravity="auto"
             />
           </div>
