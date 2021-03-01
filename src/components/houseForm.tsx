@@ -4,6 +4,7 @@ import { useMutation, gql } from "@apollo/client";
 // import { useRouter } from "next/router";
 import Link from "next/link";
 // import { Image } from "cloudinary-react";
+
 import { SearchBox } from "./searchBox";
 // import {
 //   CreateHouseMutation,
@@ -19,6 +20,14 @@ import { SearchBox } from "./searchBox";
 // Now unlike many other APIs, we automatically have everything typed for us for our backend.
 import { CreateSignatureMutation } from "src/generated/CreateSignatureMutation";
 
+/*
+schema.gql: We added a new mutation to our schema.
+We modified the house form to call the mutation and upload the image to cloudinary. In src/components/houseForm.tsx.
+We made the image signature mutation. In src/schema/image.ts.
+We added the image resolver to our schema in src/schema/index.ts.
+We have untracked generated files in src/generated.
+*/
+
 // This does not take any arguments, so no parenthesis needed to the right of the mutation name.
 const SIGNATURE_MUTATION = gql`
   mutation CreateSignatureMutation {
@@ -28,6 +37,44 @@ const SIGNATURE_MUTATION = gql`
     }
   }
 `;
+
+// This is our response back from cloudinary, so we have to actually hardcode what we care about in this interface.
+interface IUploadImageResponse {
+  secure_url: string;
+}
+
+// I think this belongs in the backend?
+// This is the functionality to actually send off the image to cloudinary.
+// The return type is a: Promise<>, which when resolved will be the IUploadResponse type.
+async function uploadImage(
+  image: File,
+  signature: string,
+  timestamp: number
+): Promise<IUploadImageResponse> {
+  // You could just hardcode the cloudinary cloud name.
+  const url = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`;
+  // FormData() is something built into our browser.
+  // To post the data we create form data we will then use fetch to post up to the cloudinary rest api.
+  const formData = new FormData();
+  formData.append("file", image);
+  // Part of the security.
+  formData.append("signature", signature);
+  // Cannot send numbers through forms, convert it to a string.
+  formData.append("timestamp", timestamp.toString());
+  // Compares to our signature to ensure that we are the correct user.
+  formData.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_KEY ?? "");
+
+  // Send the image to cloudinary. Use fetch to post to the cloudinary rest api.
+  const response = await fetch(url, {
+    // Our method header will be post.
+    method: "post",
+    // The body header will be the formData.
+    body: formData,
+  });
+
+  // Now just return the finished request.
+  return response.json();
+}
 
 interface IFormData {
   address: string;
@@ -50,6 +97,9 @@ export default function HouseForm({}: IProps) {
   const address = watch("address");
 
   // Need a useMutation hook to use the mutation we declared above.
+  // This takes time, it needs to call the mutation to get a signature.
+  // It needs to upload the image to cloudinary.
+  // It needs a response back from cloudinary.
   const [createSignature] = useMutation<CreateSignatureMutation>(
     SIGNATURE_MUTATION
   );
@@ -68,11 +118,20 @@ export default function HouseForm({}: IProps) {
   };
 
   // onSubmit means it is successful, you cna use an onError for the second argument of handleSubmit to manage an error.
+  // I don't see how graphql and uploading images are connected at all currently.
+  // I would think this should all be handled in the backend.
   const handleCreate = async (data: IFormData) => {
     console.log({ data });
     const { data: signatureData } = await createSignature();
     if (signatureData) {
-      console.log(signatureData);
+      // Let's see what we are getting back.
+      // console.log(signatureData);
+      const { signature, timestamp } = signatureData.createImageSignature;
+      // data.image is a list of files. Don't know what a signature is.
+      const imageData = await uploadImage(data.image[0], signature, timestamp);
+      // To view the data to make a type for it.
+      // console.log(imageData);
+      // imageData.secure_url
     }
   };
 
