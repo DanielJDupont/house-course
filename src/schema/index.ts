@@ -1,5 +1,5 @@
 import { buildSchemaSync, Resolver, Query } from "type-graphql";
-// import { ImageResolver } from "./image";
+import { ImageResolver } from "./image";
 // import { HouseResolver } from "./house";
 import { authChecker } from "./auth";
 
@@ -26,7 +26,7 @@ class DummyResolver {
 // It is useless to generate types in production.
 export const schema = buildSchemaSync({
   // Need to actually register our resolvers. Declare all of our queries, mutations.
-  resolvers: [DummyResolver],
+  resolvers: [DummyResolver, ImageResolver],
   // It also wants to emit a schema file.
   // Useless to have a schema file to generate types from in production. Used for the @prisma/client pseudo-npm file.
   emitSchemaFile: process.env.NODE_ENV === "development",

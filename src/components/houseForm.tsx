@@ -1,9 +1,9 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, gql } from "@apollo/client";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 import Link from "next/link";
-import { Image } from "cloudinary-react";
+// import { Image } from "cloudinary-react";
 import { SearchBox } from "./searchBox";
 // import {
 //   CreateHouseMutation,
@@ -13,7 +13,21 @@ import { SearchBox } from "./searchBox";
 //   UpdateHouseMutation,
 //   UpdateHouseMutationVariables,
 // } from "src/generated/UpdateHouseMutation";
-// import { CreateSignatureMutation } from "src/generated/CreateSignatureMutation";
+
+// yarn codegen, is a package script that does a lot, it generates the apollo client.
+// It makes all of the types for the call to the mutation.
+// Now unlike many other APIs, we automatically have everything typed for us for our backend.
+import { CreateSignatureMutation } from "src/generated/CreateSignatureMutation";
+
+// This does not take any arguments, so no parenthesis needed to the right of the mutation name.
+const SIGNATURE_MUTATION = gql`
+  mutation CreateSignatureMutation {
+    createImageSignature {
+      signature
+      timestamp
+    }
+  }
+`;
 
 interface IFormData {
   address: string;
@@ -35,6 +49,11 @@ export default function HouseForm({}: IProps) {
 
   const address = watch("address");
 
+  // Need a useMutation hook to use the mutation we declared above.
+  const [createSignature] = useMutation<CreateSignatureMutation>(
+    SIGNATURE_MUTATION
+  );
+
   useEffect(() => {
     register({ name: "address" }, { required: "Please enter your address" });
     register({ name: "latitude" }, { required: true, min: -90, max: 90 });
@@ -51,6 +70,10 @@ export default function HouseForm({}: IProps) {
   // onSubmit means it is successful, you cna use an onError for the second argument of handleSubmit to manage an error.
   const handleCreate = async (data: IFormData) => {
     console.log({ data });
+    const { data: signatureData } = await createSignature();
+    if (signatureData) {
+      console.log(signatureData);
+    }
   };
 
   return (
