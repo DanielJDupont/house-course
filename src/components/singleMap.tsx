@@ -9,7 +9,11 @@ interface House {
   longitude: number;
 }
 
-const SingleMap: React.FC<{ house: House }> = ({ house }) => {
+// Nearby is the array of up to 25 houses that are within the bounding box of the current view.
+const SingleMap: React.FC<{ house: House; nearby: House[] }> = ({
+  house,
+  nearby,
+}) => {
   const [viewport, setViewport] = useState({
     latitude: house.latitude,
     longitude: house.longitude,
@@ -41,12 +45,28 @@ const SingleMap: React.FC<{ house: House }> = ({ house }) => {
         >
           <button
             type="button"
-            // Shrinks the button slightly.
             style={{ width: "30px", height: "30px", fontSize: "30px" }}
           >
             <img src="/home-color.svg" className="w-8" alt="select house" />
           </button>
         </Marker>
+
+        {nearby.map((near) => (
+          <Marker
+            key={near.id}
+            latitude={near.latitude}
+            longitude={near.longitude}
+            offsetLeft={-15}
+            offsetTop={-15}
+          >
+            <button
+              type="button"
+              style={{ width: "30px", height: "30px", fontSize: "30px" }}
+            >
+              <img src="/home-solid.svg" className="w-8" alt="nearby house" />
+            </button>
+          </Marker>
+        ))}
       </ReactMapGL>
     </div>
   );

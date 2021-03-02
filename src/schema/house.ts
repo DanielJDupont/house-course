@@ -77,6 +77,35 @@ class House {
   // The front end cloudinary api wants the public id to display the image, we have no other use of it.
   @Field((_type) => Int)
   bedrooms!: number;
+
+  // Note we have to use this. because of our use of class instances.
+  // Get all of the homes within this bounding box.
+  /*
+      [
+        { latitude: 10, longitude: 15 },
+        { latitude: 15, longitude: 20 }
+      ]
+    */
+  @Field((_type) => [House])
+  async nearby(@Ctx() ctx: Context) {
+    const bounds = getBoundsOfDistance(
+      {
+        latitude: this.latitude,
+        longitude: this.longitude,
+      },
+      10000
+    );
+
+    return ctx.prisma.house.findMany({
+      where: {
+        latitude: { gte: bounds[0].latitude, lte: bounds[1].latitude },
+        longitude: { gte: bounds[0].longitude, lte: bounds[1].longitude },
+        id: { not: { equals: this.id } },
+      },
+      // To avoid grabbing a million homes in a city. Pretty sure it is 25 random entries within the bounding box.
+      take: 25,
+    });
+  }
 }
 
 // Make the mutation that will live inside of this resolver.
