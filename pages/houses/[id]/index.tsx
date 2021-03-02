@@ -3,7 +3,7 @@ import { Image } from "cloudinary-react";
 import { useQuery, gql } from "@apollo/client";
 import Layout from "src/components/layout";
 // import HouseNav from "src/components/houseNav";
-// import SingleMap from "src/components/singleMap";
+import SingleMap from "src/components/singleMap";
 import {
   ShowHouseQuery,
   ShowHouseQueryVariables,
@@ -37,9 +37,12 @@ export default function ShowHouse() {
 }
 
 const HouseData = ({ id }: { id: string }) => {
-  const { data, loading } = useQuery<ShowHouseQuery>(SHOW_HOUSE_QUERY, {
-    variables: { id },
-  });
+  const { data, loading } = useQuery<ShowHouseQuery, ShowHouseQueryVariables>(
+    SHOW_HOUSE_QUERY,
+    {
+      variables: { id },
+    }
+  );
 
   if (loading || !data) return <Layout main={<div>Loading ...</div>} />;
   if (!data.house)
@@ -49,11 +52,11 @@ const HouseData = ({ id }: { id: string }) => {
   return (
     <Layout
       main={
-        <div>
+        <div className="sm:block md:flex">
           {/* <pre>{JSON.stringify(house, null, 2)}</pre> */}
           <div className="sm:w-full md:w-1/2 p-4">
             <h1 className="text-3xl my-2">{house.address}</h1>
-            <div className="sm:w-full md:w-1/2">SingleMap</div>
+
             <Image
               className="pb-2"
               cloudName={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
@@ -70,8 +73,12 @@ const HouseData = ({ id }: { id: string }) => {
               // When cropped, it will try to focus on what part of the image is the most interesting.
               gravity="auto"
             />
+            <p>{house.bedrooms} Bedroom House</p>
           </div>
-          <p>{house.bedrooms} Bedroom House</p>
+
+          <div className="sm:w-full md:w-1/2">
+            <SingleMap house={house} />
+          </div>
         </div>
       }
     />
